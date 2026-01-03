@@ -9,15 +9,22 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function CreateTrip({ onNavigate }) {
+export default function CreateTrip({ onNavigate, prefillPlace }) {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [formData, setFormData] = useState({
     tripName: '',
-    place: '',
+    place: prefillPlace || '',
     startDate: '',
     endDate: '',
   });
+
+  // Update place when prefill changes
+  React.useEffect(() => {
+    if (prefillPlace) {
+      setFormData((prev) => ({ ...prev, place: prefillPlace }));
+    }
+  }, [prefillPlace]);
 
   const suggestedPlaces = [
     { id: 1, name: 'Paris, France', image: '🗼' },
@@ -54,9 +61,12 @@ export default function CreateTrip({ onNavigate }) {
     <div className="min-h-screen bg-bone">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4 md:px-10 bg-white/70 border-b border-[0.5px] border-moss/10 backdrop-blur">
-        <div className="pill text-sm font-semibold font-serif bg-white/80">
-          GT · GlobeTrotter
-        </div>
+        <button
+          onClick={() => onNavigate('landing')}
+          className="rounded-full border border-[0.5px] border-moss/15 bg-white/90 px-4 py-2 shadow-sm hover:shadow-md hover:border-sienna/40 transition"
+        >
+          <span className="text-lg md:text-xl font-serif font-bold tracking-wide text-moss">GlobeTrotter</span>
+        </button>
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
