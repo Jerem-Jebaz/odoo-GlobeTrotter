@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export default function Trips({ onNavigate }) {
+export default function Trips({ onNavigate, prefillTripData }) {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -214,12 +214,12 @@ export default function Trips({ onNavigate }) {
   const today = new Date().toISOString().split('T')[0];
 
   const suggestedPlaces = [
-    { id: 1, city: 'Goa', state: 'Goa', image: '🏖️' },
-    { id: 2, city: 'Jaipur', state: 'Rajasthan', image: '🏰' },
-    { id: 3, city: 'Mumbai', state: 'Maharashtra', image: '🏙️' },
-    { id: 4, city: 'Shimla', state: 'Himachal Pradesh', image: '⛰️' },
-    { id: 5, city: 'Varanasi', state: 'Uttar Pradesh', image: '🕉️' },
-    { id: 6, city: 'Kochi', state: 'Kerala', image: '🌴' },
+    { id: 1, city: 'Goa', state: 'Goa', image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400&h=300&fit=crop&q=80' },
+    { id: 2, city: 'Jaipur', state: 'Rajasthan', image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&h=300&fit=crop&q=80' },
+    { id: 3, city: 'New Delhi', state: 'Delhi', image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=300&fit=crop&q=80' },
+    { id: 4, city: 'Shimla', state: 'Himachal Pradesh', image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop&q=80' },
+    { id: 5, city: 'Chennai', state: 'Tamil Nadu', image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=400&h=300&fit=crop&q=80' },
+    { id: 6, city: 'Kochi', state: 'Kerala', image: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=400&h=300&fit=crop&q=80' },
   ];
 
   useEffect(() => {
@@ -228,6 +228,19 @@ export default function Trips({ onNavigate }) {
     const userTrips = storedTrips.filter(trip => trip.userId === user?.id);
     setTrips(userTrips);
   }, [user]);
+
+  useEffect(() => {
+    if (prefillTripData) {
+      setShowCreateForm(true);
+      setFormData((prev) => ({
+        ...prev,
+        ...prefillTripData,
+        country: 'India',
+        startDate: prev.startDate,
+        endDate: prev.endDate,
+      }));
+    }
+  }, [prefillTripData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -315,9 +328,12 @@ export default function Trips({ onNavigate }) {
     <div className="min-h-screen bg-bone">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4 md:px-10 bg-white/70 border-b border-[0.5px] border-moss/10 backdrop-blur">
-        <div className="pill text-sm font-semibold font-serif bg-white/80">
-          GT · GlobeTrotter
-        </div>
+        <button
+          onClick={() => onNavigate('landing')}
+          className="rounded-full border border-[0.5px] border-moss/15 bg-white/90 px-4 py-2 shadow-sm hover:shadow-md hover:border-sienna/40 transition"
+        >
+          <span className="text-lg md:text-xl font-serif font-bold tracking-wide text-moss">GlobeTrotter</span>
+        </button>
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -503,10 +519,18 @@ export default function Trips({ onNavigate }) {
                     key={place.id}
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, city: place.city, state: place.state }))}
-                    className="bento-card p-4 h-32 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:border-sienna/30 transition group"
+                    className="group relative overflow-hidden rounded-2xl border border-[0.5px] border-moss/15 h-40 cursor-pointer hover:shadow-xl transition-all"
                   >
-                    <div className="text-4xl mb-2 group-hover:scale-110 transition">{place.image}</div>
-                    <span className="text-center text-sm font-semibold text-moss">{place.city}, {place.state}</span>
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-110"
+                      style={{ backgroundImage: `url('${place.image}')` }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-moss/90 via-moss/40 to-transparent" />
+                    <div className="absolute inset-0 flex items-end p-4">
+                      <span className="text-base font-serif font-semibold text-bone drop-shadow-lg">
+                        {place.city}, {place.state}
+                      </span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -515,22 +539,10 @@ export default function Trips({ onNavigate }) {
         )}
 
         {/* Trips List */}
-        <section>
-          {trips.length === 0 ? (
-            <div className="bento-card p-12 text-center">
-              <div className="text-6xl mb-4">✈️</div>
-              <h3 className="text-2xl font-serif font-bold text-moss mb-2">No trips yet</h3>
-              <p className="text-moss/60 mb-6">Start planning your first adventure!</p>
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="cta"
-              >
-                <Plus className="h-4 w-4" />
-                Create Your First Trip
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {!showCreateForm && (
+          <section>
+            {trips.length > 0 && (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {trips.map((trip) => (
                 <div key={trip.id} className="bento-card p-6 group">
                   <div className="flex items-start justify-between mb-4">
@@ -566,7 +578,8 @@ export default function Trips({ onNavigate }) {
               ))}
             </div>
           )}
-        </section>
+          </section>
+        )}
       </main>
 
       {/* Bottom Navigation */}
