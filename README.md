@@ -24,7 +24,6 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=globetrotter
-JWT_SECRET=your-secret-key-change-in-production
 ```
 
 3) Initialize DB (creates DB, tables, seeds states/cities, creates admin)
