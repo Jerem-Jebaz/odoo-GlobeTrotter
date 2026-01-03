@@ -11,12 +11,30 @@ import Trips from './pages/Trips';
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [currentTripId, setCurrentTripId] = useState(null);
+  const [prefillPlace, setPrefillPlace] = useState(null);
+  const [prefillTripData, setPrefillTripData] = useState(null);
   const { user } = useAuth();
 
-  const handleNavigate = (page, tripId = null) => {
+  const handleNavigate = (page, payload = null) => {
     setCurrentPage(page);
-    if (tripId) {
-      setCurrentTripId(tripId);
+
+    // Support legacy tripId number or payload object
+    if (typeof payload === 'number') {
+      setCurrentTripId(payload);
+    } else if (payload && typeof payload === 'object') {
+      if (payload.tripId) setCurrentTripId(payload.tripId);
+      if (payload.prefillPlace) setPrefillPlace(payload.prefillPlace);
+      if (payload.prefillTripData) setPrefillTripData(payload.prefillTripData);
+    }
+
+    // Clear prefill when leaving createTrip
+    if (page !== 'createTrip') {
+      setPrefillPlace(null);
+    }
+
+    // Clear trip prefill when leaving trips
+    if (page !== 'trips') {
+      setPrefillTripData(null);
     }
   };
 
@@ -26,11 +44,11 @@ function Dashboard() {
   }
 
   if (currentPage === 'trips') {
-    return <Trips onNavigate={handleNavigate} />;
+    return <Trips onNavigate={handleNavigate} prefillTripData={prefillTripData} />;
   }
 
   if (currentPage === 'createTrip') {
-    return <CreateTrip onNavigate={handleNavigate} />;
+    return <CreateTrip onNavigate={handleNavigate} prefillPlace={prefillPlace} />;
   }
 
   if (currentPage === 'itinerary') {
