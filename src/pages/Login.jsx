@@ -6,9 +6,10 @@ export default function Login({ onSwitchToRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Please fill in all fields');
@@ -18,11 +19,16 @@ export default function Login({ onSwitchToRegister }) {
       setError('Please enter a valid email');
       return;
     }
+    
+    setIsLoading(true);
+    setError('');
+    
     try {
-      login(email, password);
-      setError('');
+      await login(email, password);
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,9 +95,10 @@ export default function Login({ onSwitchToRegister }) {
             {/* Login Button */}
             <button
               type="submit"
-              className="cta w-full justify-center mt-6 bg-sienna hover:bg-sienna/90"
+              disabled={isLoading}
+              className="cta w-full justify-center mt-6 bg-sienna hover:bg-sienna/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Login
+              {isLoading ? 'Logging in...' : 'Login'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
@@ -115,7 +122,7 @@ export default function Login({ onSwitchToRegister }) {
 
         {/* Footer Note */}
         <p className="text-center text-xs text-moss/60">
-          This is a demo. No real password validation yet—use any email/password to proceed.
+          <strong>Admin Login:</strong> admin@globetrotter.com / admin
         </p>
       </div>
     </div>
