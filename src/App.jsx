@@ -4,19 +4,42 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Landing from './pages/Landing';
 import Profile from './pages/Profile';
+import CreateTrip from './pages/CreateTrip';
+import Itinerary from './pages/Itinerary';
+import Trips from './pages/Trips';
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState('landing');
+  const [currentTripId, setCurrentTripId] = useState(null);
   const { user } = useAuth();
+
+  const handleNavigate = (page, tripId = null) => {
+    setCurrentPage(page);
+    if (tripId) {
+      setCurrentTripId(tripId);
+    }
+  };
 
   // Render different pages based on currentPage state
   if (currentPage === 'profile') {
-    return <Profile onBack={() => setCurrentPage('landing')} />;
+    return <Profile onBack={() => handleNavigate('landing')} />;
+  }
+
+  if (currentPage === 'trips') {
+    return <Trips onNavigate={handleNavigate} />;
+  }
+
+  if (currentPage === 'createTrip') {
+    return <CreateTrip onNavigate={handleNavigate} />;
+  }
+
+  if (currentPage === 'itinerary') {
+    return <Itinerary onNavigate={handleNavigate} tripId={currentTripId} />;
   }
 
   return (
     <div className="min-h-screen bg-bone text-moss">
-      <Landing onNavigate={setCurrentPage} />
+      <Landing onNavigate={handleNavigate} />
     </div>
   );
 }
