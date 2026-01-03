@@ -159,7 +159,10 @@ export default function Landing({ onNavigate }) {
           <div className="flex items-center gap-3 mb-6">
             <h2 className="text-2xl font-serif font-bold text-moss">Previous Trips</h2>
             <div className="flex-1 h-[0.5px] bg-moss/10" />
-            <button className="pill">
+            <button
+              onClick={() => onNavigate('createTrip')}
+              className="pill hover:bg-sienna hover:text-bone hover:border-sienna transition"
+            >
               <Plus className="h-4 w-4" />
               Plan a trip
             </button>
@@ -183,19 +186,31 @@ export default function Landing({ onNavigate }) {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-4 left-1/2 z-20 w-[90%] max-w-2xl -translate-x-1/2 rounded-full border border-[0.5px] border-moss/15 bg-white/80 px-4 py-2 shadow-xl backdrop-blur">
         <div className="flex items-center justify-between text-xs">
-          <button className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss">
+          <button
+            onClick={() => onNavigate('landing')}
+            className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss"
+          >
             <span>🔍</span>
             <span>Discover</span>
           </button>
-          <button className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss">
+          <button
+            onClick={() => onNavigate('trips')}
+            className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss"
+          >
             <span>✈️</span>
             <span>Trips</span>
           </button>
-          <button className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss">
+          <button
+            onClick={() => onNavigate('calendar')}
+            className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss"
+          >
             <span>📅</span>
             <span>Calendar</span>
           </button>
-          <button className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss">
+          <button
+            onClick={() => onNavigate('community')}
+            className="flex flex-col items-center gap-1 rounded-full px-3 py-1 text-moss/70 hover:text-moss"
+          >
             <span>👥</span>
             <span>Community</span>
           </button>
