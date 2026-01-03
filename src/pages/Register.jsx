@@ -7,12 +7,14 @@ export default function Register({ onSwitchToLogin }) {
     firstName: '',
     lastName: '',
     email: '',
+    password: '',
     phone: '',
     city: '',
-    country: '',
+    country: 'India',
     additionalInfo: '',
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
 
   const handleChange = (e) => {
@@ -20,11 +22,11 @@ export default function Register({ onSwitchToLogin }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     
     // Validation
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       return;
     }
@@ -32,12 +34,20 @@ export default function Register({ onSwitchToLogin }) {
       setError('Please enter a valid email');
       return;
     }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
 
+    setIsLoading(true);
+    setError('');
+    
     try {
-      register(formData);
-      setError('');
+      await register(formData);
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -107,6 +117,24 @@ export default function Register({ onSwitchToLogin }) {
                 </div>
               </div>
               <div className="space-y-2">
+                <label className="label">Password</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-sienna" strokeWidth={1.5} />
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="input pl-10 w-full"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Phone & Country */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <label className="label">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-3.5 h-4 w-4 text-sienna" strokeWidth={1.5} />
@@ -116,25 +144,7 @@ export default function Register({ onSwitchToLogin }) {
                     value={formData.phone}
                     onChange={handleChange}
                     className="input pl-10 w-full"
-                    placeholder="+1 (555) 123-4567"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* City & Country */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="label">City</label>
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-3.5 h-4 w-4 text-sienna" strokeWidth={1.5} />
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    className="input pl-10 w-full"
-                    placeholder="New York"
+                    placeholder="+91-9876543210"
                   />
                 </div>
               </div>
@@ -147,10 +157,26 @@ export default function Register({ onSwitchToLogin }) {
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
-                    className="input pl-10 w-full"
-                    placeholder="United States"
+                    className="input pl-10 w-full bg-moss/5 cursor-not-allowed"
+                    disabled
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* City & Additional */}
+            <div className="space-y-2">
+              <label className="label">City</label>
+              <div className="relative">
+                <MapPin className="absolute left-4 top-3.5 h-4 w-4 text-sienna" strokeWidth={1.5} />
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className="input pl-10 w-full"
+                  placeholder="Delhi"
+                />
               </div>
             </div>
 
@@ -179,9 +205,10 @@ export default function Register({ onSwitchToLogin }) {
             {/* Register Button */}
             <button
               type="submit"
-              className="cta w-full justify-center mt-6 bg-sienna hover:bg-sienna/90"
+              disabled={isLoading}
+              className="cta w-full justify-center mt-6 bg-sienna hover:bg-sienna/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
